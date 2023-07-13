@@ -28,3 +28,10 @@ For development:
 pip install -r ./requirements.txt -r ./requirements.dev.txt
 ```
 
+Run:
+```
+dvc repro -R .
+```
+
+Open `main.ipynb` and execute all cells.
+
