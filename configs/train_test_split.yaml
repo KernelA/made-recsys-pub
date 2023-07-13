@@ -1,0 +1,11 @@
+hydra:
+  run:
+    dir: .
+  output_subdir: null
+
+train_ratio: 0.8
+predict_top_n: 10
+seed: 65323
+dump_dir: ./data/dump
+train_dir: ./data/train
+test_dir: ./data/test

@@ -1,0 +1,7 @@
+hydra:
+  run:
+    dir: .
+  output_subdir: null
+
+data_dir: ./data/raw/ml-1m
+dump_dir: ./data/dump

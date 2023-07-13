@@ -1,0 +1,18 @@
+hydra:
+  run:
+    dir: ./data/item2item
+  sweep:
+    dir: ./data/item2item
+    subdir: ${hydra.job.override_dirname}
+
+
+algo:
+  _target_: 'made_recsys.item2item.Item2ItemRecommender'
+  seed: 12123
+  metric: 'cosine'
+  max_candidates: 101
+  low_memory: false
+
+test_dir: ${hydra:runtime.cwd}/data/test
+train_dir: ${hydra:runtime.cwd}/data/train
+dump_dir: ./index_dump

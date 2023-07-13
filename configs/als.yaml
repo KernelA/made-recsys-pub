@@ -1,0 +1,41 @@
+defaults:
+  - override hydra/sweeper: optuna
+
+hydra:
+  run:
+    dir: ./data/als
+  sweep:
+    dir: ./data/als
+    subdir: ${hydra.job.override_dirname}
+  sweeper:
+    sampler:
+      _target_: optuna.samplers.TPESampler
+      seed: 123
+      consider_prior: true
+      prior_weight: 1.0
+      consider_magic_clip: true
+      consider_endpoints: false
+      n_startup_trials: 10
+      n_ei_candidates: 24
+      multivariate: false
+      warn_independent_sampling: true
+    _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+    direction: maximize
+    storage: null
+    study_name: 'als'
+    n_trials: 30
+    params:
+      algo.latent_size: choice(2, 4, 8, 16)
+      algo.l2_reg: interval(1e-2,10.0)
+      algo.num_iterations: range(5, 10)
+
+algo:
+  _target_: "made_recsys.als.ALS"
+  latent_size: 2
+  l2_reg: 0.1
+  num_iterations: 100
+  seed: 12123
+
+test_dir: ${hydra:runtime.cwd}/data/test
+train_dir: ${hydra:runtime.cwd}/data/train
+dump_dir: ./index_dump

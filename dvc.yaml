@@ -1,0 +1,58 @@
+stages:
+  download_data:
+    vars:
+      - ./configs/convert.yaml:data_dir
+    cmd: kaggle datasets download -d odedgolden/movielens-1m-dataset -p ${data_dir} --unzip
+    deps:
+      - ./configs/convert.yaml
+    outs:
+      - ${data_dir}
+
+  convert_to_parquet:
+    vars:
+       - ./configs/convert.yaml
+    cmd: python ./save_data.py
+    deps:
+    - ./configs/convert.yaml
+    - ${data_dir}
+    - ./save_data.py
+    outs:
+      - ${dump_dir}
+
+  train_test_split:
+    vars:
+      - ./configs/train_test_split.yaml
+    cmd: python ./train_test_split.py
+    deps:
+    - ./configs/train_test_split.yaml
+    - ${dump_dir}
+    - ./train_test_split.py
+    outs:
+      - ${train_dir}
+      - ${test_dir}
+
+  compute_item2item_sim:
+    vars:
+      - configs/item2item.yaml:hydra
+      - configs/train_test_split.yaml:train_dir,test_dir
+    cmd: python ./compute_item2item_sim.py --multirun algo.metric='cosine','jaccard'
+    deps:
+    - ./configs/item2item.yaml
+    - ${train_dir}
+    - ${test_dir}
+    - ./compute_item2item_sim.py
+    outs:
+      - ${hydra.sweep.dir}
+
+  als_hyperparams_search:
+    vars:
+      - configs/als.yaml:hydra
+      - configs/train_test_split.yaml:train_dir,test_dir
+    cmd: python ./als_hyperparams_search.py --multirun
+    deps:
+    - ./configs/als.yaml
+    - ${train_dir}
+    - ${test_dir}
+    - ./als_hyperparams_search.py
+    outs:
+      - ${hydra.sweep.dir}
